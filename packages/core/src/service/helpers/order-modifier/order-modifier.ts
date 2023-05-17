@@ -50,7 +50,8 @@ import { EntityHydrator } from '../entity-hydrator/entity-hydrator.service';
 import { OrderCalculator } from '../order-calculator/order-calculator';
 import { TranslatorService } from '../translator/translator.service';
 import { patchEntity } from '../utils/patch-entity';
-
+import { translateDeep } from '../utils/translate-entity';
+import { ShippingMethodService } from '../../services/shipping-method.service';
 /**
  * @description
  * This helper is responsible for modifying the contents of an Order.
@@ -80,6 +81,7 @@ export class OrderModifier {
         private entityHydrator: EntityHydrator,
         private historyService: HistoryService,
         private translator: TranslatorService,
+        private shippingMethodService: ShippingMethodService,
     ) {}
 
     /**
@@ -460,6 +462,18 @@ export class OrderModifier {
             order.couponCodes = input.couponCodes;
         }
 
+        if(input.shippingMethodId){
+            const shippingLine = order.shippingLines[0];
+            const currentShippingMethod = (shippingLine === null || shippingLine === void 0 ? void 0 : shippingLine.shippingMethodId) &&
+                (await this.shippingMethodService.findOne(ctx, shippingLine.shippingMethodId));
+
+            if(!currentShippingMethod){
+                throw new InternalServerError(`error.shipping-method-not-found`, {
+                shippingMethodId: shippingLine.shippingMethodId,
+                });
+            }
+            order.shippingLines[0].shippingMethodId = input.shippingMethodId;
+        }
         const updatedOrderLines = order.lines.filter(l => updatedOrderLineIds.includes(l.id));
         const promotions = await this.promotionService.getActivePromotionsInChannel(ctx);
         const activePromotionsPre = await this.promotionService.getActivePromotionsOnOrder(ctx, order.id);

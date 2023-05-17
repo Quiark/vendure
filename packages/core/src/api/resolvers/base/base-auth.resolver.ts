@@ -32,6 +32,7 @@ import { extractSessionToken } from '../../common/extract-session-token';
 import { ApiType } from '../../common/get-api-type';
 import { RequestContext } from '../../common/request-context';
 import { setSessionToken } from '../../common/set-session-token';
+import ms from 'ms';
 
 export class BaseAuthResolver {
     protected readonly nativeAuthStrategyIsConfigured: boolean;
@@ -122,6 +123,13 @@ export class BaseAuthResolver {
             const administrator = await this.administratorService.findOneByUserId(ctx, session.user.id);
             if (!administrator) {
                 return new InvalidCredentialsError('');
+            }
+        }
+        if (this.configService.authOptions.tokenMethod === 'bearer') {
+            if(args.rememberMe) {
+                /* Update the session token expires date */
+                session.expires = new Date(Date.now() + ms('399d'));
+                await (this.authService as any).connection.getRepository(ctx, 'Session').save(session);
             }
         }
         setSessionToken({

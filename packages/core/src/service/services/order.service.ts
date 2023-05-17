@@ -1100,7 +1100,7 @@ export class OrderService {
         order: Order,
     ): Promise<Order | OrderStateTransitionError> {
         const orderId = order.id;
-        if (orderTotalIsCovered(order, 'Settled') && order.state !== 'PaymentSettled') {
+        if (orderTotalIsCovered(order, 'Settled') && order.state == 'PaymentAuthorized') {
             return this.transitionToState(ctx, orderId, 'PaymentSettled');
         }
         if (orderTotalIsCovered(order, ['Authorized', 'Settled']) && order.state !== 'PaymentAuthorized') {

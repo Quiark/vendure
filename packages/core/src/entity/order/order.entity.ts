@@ -213,7 +213,20 @@ export class Order extends VendureEntity implements ChannelAware, HasCustomField
         expression: 'total',
     })
     get total(): number {
-        return this.subTotal + (this.shipping || 0);
+                let shippingUseCredit = 0;
+        if (this.surcharges) {
+            /* find surcharge description = "UserCredits" && sku = "shippingUseCredit"  */
+            const shippingSurchargeUseCredits = this.surcharges.find(
+                (surcharge) =>
+                surcharge.description === "UserCredits" &&
+                surcharge.sku === "shippingUseCredit"
+            );
+            if (shippingSurchargeUseCredits) {
+                shippingUseCredit = shippingSurchargeUseCredits.price;
+            }
+        }
+
+        return this.subTotal + (this.shipping || 0) + shippingUseCredit;
     }
 
     /**
@@ -237,7 +250,24 @@ export class Order extends VendureEntity implements ChannelAware, HasCustomField
         expression: 'twt',
     })
     get totalWithTax(): number {
-        return this.subTotalWithTax + (this.shippingWithTax || 0);
+               let shippingUseCredit = 0;
+        if (this.surcharges) {
+            /* find surcharge description = "UserCredits" && sku = "shippingUseCredit"  */
+            const shippingSurchargeUseCredits = this.surcharges.find(
+                (surcharge) =>
+                surcharge.description === "UserCredits" &&
+                surcharge.sku === "shippingUseCredit"
+            );
+            if (shippingSurchargeUseCredits) {
+                shippingUseCredit = shippingSurchargeUseCredits.priceWithTax;
+            }
+        }
+
+        // console.log("order.entity.js this: ", this, shippingUseCredit);
+
+        return (
+            this.subTotalWithTax + (this.shippingWithTax || 0) + shippingUseCredit
+        );
     }
 
     @Calculated({
