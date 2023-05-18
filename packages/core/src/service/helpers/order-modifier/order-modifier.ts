@@ -462,17 +462,17 @@ export class OrderModifier {
             order.couponCodes = input.couponCodes;
         }
 
-        if(input.shippingMethodId){
+        if ((input as any).shippingMethodId) {
             const shippingLine = order.shippingLines[0];
             const currentShippingMethod = (shippingLine === null || shippingLine === void 0 ? void 0 : shippingLine.shippingMethodId) &&
-                (await this.shippingMethodService.findOne(ctx, shippingLine.shippingMethodId));
+                (await this.shippingMethodService.findOne(ctx, shippingLine.shippingMethodId!));
 
-            if(!currentShippingMethod){
+            if (!currentShippingMethod){
                 throw new InternalServerError(`error.shipping-method-not-found`, {
-                shippingMethodId: shippingLine.shippingMethodId,
+                    shippingMethodId: shippingLine.shippingMethodId!,
                 });
             }
-            order.shippingLines[0].shippingMethodId = input.shippingMethodId;
+            order.shippingLines[0].shippingMethodId = (input as any).shippingMethodId!;
         }
         const updatedOrderLines = order.lines.filter(l => updatedOrderLineIds.includes(l.id));
         const promotions = await this.promotionService.getActivePromotionsInChannel(ctx);

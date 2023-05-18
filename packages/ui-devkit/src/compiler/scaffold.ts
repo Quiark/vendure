@@ -2,6 +2,7 @@
 import { spawn } from 'child_process';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as origfs from 'fs';
 
 import {
     EXTENSION_ROUTES_FILE,
@@ -76,13 +77,13 @@ function deleteExistingExtensionModules(outputPath: string) {
  */
 async function copyExtensionModules(outputPath: string, extensions: Array<Required<AdminUiExtension>>) {
     const extensionRoutesSource = generateLazyExtensionRoutes(extensions);
-    fs.writeFileSync(path.join(outputPath, EXTENSION_ROUTES_FILE), extensionRoutesSource, 'utf8');
+    writeFileSync(path.join(outputPath, EXTENSION_ROUTES_FILE), extensionRoutesSource, 'utf8');
     const sharedExtensionModulesSource = generateSharedExtensionModule(extensions);
-    fs.writeFileSync(path.join(outputPath, SHARED_EXTENSIONS_FILE), sharedExtensionModulesSource, 'utf8');
+    writeFileSync(path.join(outputPath, SHARED_EXTENSIONS_FILE), sharedExtensionModulesSource, 'utf8');
 
     for (const extension of extensions) {
         const dest = path.join(outputPath, MODULES_OUTPUT_DIR, extension.id);
-        fs.copySync(extension.extensionPath, dest);
+        copyDirs(extension.extensionPath, dest);
     }
 }
 
@@ -132,6 +133,7 @@ async function addGlobalStyles(
         imports.map(file => `@import "./${GLOBAL_STYLES_OUTPUT_DIR}/${file}";`).join('\n');
 
     const globalStylesFile = path.join(outputPath, 'src', 'global-styles.scss');
+    await fs.chmod(globalStylesFile, 0o744)
     await fs.writeFile(globalStylesFile, globalStylesSource, 'utf-8');
 }
 
@@ -192,6 +194,32 @@ function getModuleFilePath(
     return `./extensions/${id}/${path.basename(module.ngModuleFileName, '.ts')}`;
 }
 
+// These 2 fns are a part of a hack to work around the fact that fs-extra's copySync() copies folder
+// permissions which are read-only when coming from Nix store. At least don't need to override the fs-utils package.
+function permissibleCopyFilter(src: string, dest: string) {
+    if (fs.existsSync(dest)) {
+        origfs.chmodSync(dest, 0o744);
+    }
+    return true
+}
+
+function dirsFirstFilter(src: string, dest: string) {
+    if (fs.statSync(src).isDirectory()) {
+        return true
+    }
+    return false;
+}
+
+function copyDirs(src: string, dest: string) {
+    fs.copySync(src, dest, { filter: dirsFirstFilter });
+    fs.copySync(src, dest, { filter: permissibleCopyFilter });
+}
+
+function writeFileSync(filePath: string, data: string, options: any) {
+    fs.chmodSync(filePath, 0o744);
+    fs.writeFileSync(filePath, data, options);
+}
+
 /**
  * Copy the Admin UI sources & static assets to the outputPath if it does not already
  * exists there.
@@ -214,13 +242,13 @@ function copyAdminUiSource(outputPath: string) {
 
     // copy scaffold
     fs.removeSync(outputPath);
-    fs.ensureDirSync(outputPath);
-    fs.copySync(scaffoldDir, outputPath);
+    fs.ensureDirSync(path.join(outputPath, 'src'));
+    copyDirs(scaffoldDir, outputPath);
 
     // copy source files from admin-ui package
     const outputSrc = path.join(outputPath, 'src');
     fs.ensureDirSync(outputSrc);
-    fs.copySync(adminUiSrc, outputSrc);
+    copyDirs(adminUiSrc, outputSrc);
 }
 
 /**
