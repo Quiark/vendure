@@ -58,6 +58,9 @@ export async function mergeExtensionTranslations(
         }
         const translationFile = path.join(i18nMessagesDir, `${languageCode}.json`);
         const translationBackupFile = path.join(i18nMessagesDir, `${languageCode}.json.bak`);
+        if (fs.existsSync(translationFile)) {
+            fs.chmodSync(translationFile, 0o744);
+        }
 
         if (fs.existsSync(translationBackupFile)) {
             // restore the original translations from the backup

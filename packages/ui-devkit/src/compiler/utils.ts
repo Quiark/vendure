@@ -60,6 +60,7 @@ export async function copyStaticAsset(outputPath: string, staticAssetDef: Static
     const assetBasename = path.basename(staticAssetPath);
     assetOutputPath = path.join(outputPath, STATIC_ASSETS_OUTPUT_DIR, assetBasename);
     fs.copySync(staticAssetPath, assetOutputPath);
+    fs.chmodSync(assetOutputPath, 0o644);
     if (typeof staticAssetDef !== 'string') {
         // The asset is being renamed
         const newName = path.join(path.dirname(assetOutputPath), staticAssetDef.rename);
