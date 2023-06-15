@@ -1070,7 +1070,7 @@ export class OrderService {
         if (payment.state === 'Declined') {
             return new PaymentDeclinedError(payment.errorMessage || '');
         }
-        
+
         return this.transitionOrderIfTotalIsCovered(ctx, order);
     }
 
@@ -1100,7 +1100,7 @@ export class OrderService {
         order: Order,
     ): Promise<Order | OrderStateTransitionError> {
         const orderId = order.id;
-        if (orderTotalIsCovered(order, 'Settled') && order.state == 'PaymentAuthorized') {
+        if (orderTotalIsCovered(order, 'Settled') && order.state !== 'PaymentSettled') {
             return this.transitionToState(ctx, orderId, 'PaymentSettled');
         }
         if (orderTotalIsCovered(order, ['Authorized', 'Settled']) && order.state !== 'PaymentAuthorized') {
