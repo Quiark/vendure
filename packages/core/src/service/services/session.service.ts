@@ -109,7 +109,7 @@ export class SessionService implements EntitySubscriberInterface {
         const token = await this.generateSessionToken();
         const session = new AnonymousSession({
             token,
-            expires: this.getExpiryDate(this.sessionDurationInMs),
+            expires: this.getExpiryDate(1000 * 60 * 60 * 2), // 2 hours
             invalidated: false,
         });
         // save the new session
