@@ -29,7 +29,7 @@ export abstract class Session extends VendureEntity {
     @EntityId({ nullable: true })
     activeOrderId?: ID;
 
-    @ManyToOne(type => Order, { createForeignKeyConstraints: false })
+    @ManyToOne(type => Order)
     activeOrder: Order | null;
 
     @EntityId({ nullable: true })
