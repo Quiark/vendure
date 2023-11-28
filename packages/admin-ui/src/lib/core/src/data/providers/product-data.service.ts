@@ -3,10 +3,12 @@ import { pick } from '@vendure/common/lib/pick';
 import {
     AddOptionGroupToProduct,
     AddOptionToGroup,
+    AssetFilterParameter,
     AssignProductsToChannel,
     AssignProductsToChannelInput,
     AssignProductVariantsToChannelInput,
     AssignVariantsToChannel,
+    CreateAssetInput,
     CreateAssets,
     CreateProduct,
     CreateProductInput,
@@ -37,6 +39,7 @@ import {
     GetProductWithVariants,
     GetTag,
     GetTagList,
+    LogicalOperator,
     ProductListOptions,
     ProductSelectorSearch,
     ProductVariantListOptions,
@@ -75,9 +78,9 @@ import {
     CREATE_TAG,
     DELETE_ASSETS,
     DELETE_PRODUCT,
+    DELETE_PRODUCTS,
     DELETE_PRODUCT_OPTION,
     DELETE_PRODUCT_VARIANT,
-    DELETE_PRODUCTS,
     DELETE_TAG,
     GET_ASSET,
     GET_ASSET_LIST,
@@ -376,7 +379,12 @@ export class ProductDataService {
         );
     }
 
-    getAssetList(take: number = 10, skip: number = 0) {
+    getAssetList(
+        take: number = 10,
+        skip: number = 0,
+        filter?: AssetFilterParameter | undefined,
+        filterOperator?: LogicalOperator | undefined,
+    ) {
         return this.baseDataService.query<GetAssetList.Query, GetAssetList.Variables>(GET_ASSET_LIST, {
             options: {
                 skip,
@@ -384,6 +392,8 @@ export class ProductDataService {
                 sort: {
                     createdAt: SortOrder.DESC,
                 },
+                filter,
+                filterOperator,
             },
         });
     }
@@ -394,9 +404,12 @@ export class ProductDataService {
         });
     }
 
-    createAssets(files: File[]) {
+    createAssets(files: File[], options: Partial<CreateAssetInput> = {}) {
         return this.baseDataService.mutate<CreateAssets.Mutation, CreateAssets.Variables>(CREATE_ASSETS, {
-            input: files.map(file => ({ file })),
+            input: files.map((file: any) => ({
+                ...options,
+                file,
+            })),
         });
     }
 

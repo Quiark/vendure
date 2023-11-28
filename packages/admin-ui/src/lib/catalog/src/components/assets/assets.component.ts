@@ -15,6 +15,7 @@ import {
     ModalService,
     Permission,
 } from '@vendure/admin-ui/core';
+import { AssetFilterParameter, CreateAssetInput } from '@vendure/common/lib/generated-types';
 import { unique } from '@vendure/common/lib/unique';
 
 export interface AssetChange {
@@ -52,12 +53,22 @@ export class AssetsComponent {
     @Input()
     updatePermissions: string | string[] | Permission | Permission[];
 
+    @Input()
+    assetFilter: AssetFilterParameter = {};
+
+    @Input()
+    createAssetOpts: Partial<CreateAssetInput> = {};
+
     constructor(private modalService: ModalService, private changeDetector: ChangeDetectorRef) {}
 
     selectAssets() {
         this.modalService
             .fromComponent(AssetPickerDialogComponent, {
                 size: 'xl',
+                locals: {
+                    assetFilter: this.assetFilter,
+                    createAssetOpts: this.createAssetOpts,
+                },
             })
             .subscribe(result => {
                 if (result && result.length) {
