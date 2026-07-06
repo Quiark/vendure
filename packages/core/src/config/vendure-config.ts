@@ -27,6 +27,7 @@ import { FulfillmentHandler } from './fulfillment/fulfillment-handler';
 import { JobQueueStrategy } from './job-queue/job-queue-strategy';
 import { VendureLogger } from './logger/vendure-logger';
 import { ActiveOrderStrategy } from './order/active-order-strategy';
+import { AddItemToOrderValidationStrategy } from './order/add-item-to-order-validation-strategy';
 import { ChangedPriceHandlingStrategy } from './order/changed-price-handling-strategy';
 import { CustomOrderProcess } from './order/custom-order-process';
 import { OrderByCodeAccessStrategy } from './order/order-by-code-access-strategy';
@@ -485,6 +486,15 @@ export interface OrderOptions {
      * @default DefaultPriceCalculationStrategy
      */
     orderItemPriceCalculationStrategy?: OrderItemPriceCalculationStrategy;
+    /**
+     * @description
+     * Allows additional custom validation logic to run whenever an item is added to an Order
+     * via `addItemToOrder`, on top of the built-in checks (positive quantity, order state,
+     * item/line limits, stock availability). Each strategy may throw to reject the operation.
+     *
+     * @default []
+     */
+    addItemToOrderValidationStrategies?: AddItemToOrderValidationStrategy[];
     /**
      * @description
      * Allows the definition of custom states and transition logic for the order process state machine.

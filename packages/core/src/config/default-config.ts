@@ -131,6 +131,7 @@ export const defaultConfig: RuntimeVendureConfig = {
         orderItemsLimit: 999,
         orderLineItemsLimit: 999,
         orderItemPriceCalculationStrategy: new DefaultOrderItemPriceCalculationStrategy(),
+        addItemToOrderValidationStrategies: [],
         mergeStrategy: new MergeOrdersStrategy(),
         checkoutMergeStrategy: new UseGuestStrategy(),
         process: [],

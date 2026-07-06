@@ -515,6 +515,10 @@ export class OrderService {
         if (variant.product.enabled === false) {
             throw new EntityNotFoundError('ProductVariant', productVariantId);
         }
+        const { addItemToOrderValidationStrategies } = this.configService.orderOptions;
+        for (const strategy of addItemToOrderValidationStrategies ?? []) {
+            await strategy.validateAddItemToOrder(ctx, order, variant, quantity);
+        }
         const correctedQuantity = await this.orderModifier.constrainQuantityToSaleable(
             ctx,
             variant,
