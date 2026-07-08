@@ -22,7 +22,7 @@
       "./typings"
     ],
     "lib": [
-      "es2019",
+      "es2022",
       "dom",
       "esnext.asynciterable"
     ],

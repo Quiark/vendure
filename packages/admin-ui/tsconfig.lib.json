@@ -7,9 +7,9 @@
     "inlineSources": true,
     "types": [],
     "lib": [
-      "es2019",
+      "es2022",
       "dom",
-      "es2018"
+      "esnext.asynciterable"
     ]
   },
   "angularCompilerOptions": {
