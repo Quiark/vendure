@@ -1,7 +1,7 @@
 import { pick } from '@vendure/common/lib/pick';
 
 import * as Codegen from '../../common/generated-types';
-import { SortOrder } from '../../common/generated-types';
+import { AssetFilterParameter, CreateAssetInput, LogicalOperator, SortOrder } from '../../common/generated-types';
 import {
     ADD_OPTION_GROUP_TO_PRODUCT,
     ADD_OPTION_TO_GROUP,
@@ -343,7 +343,12 @@ export class ProductDataService {
         });
     }
 
-    getAssetList(take = 10, skip = 0) {
+    getAssetList(
+        take = 10,
+        skip = 0,
+        filter?: AssetFilterParameter,
+        filterOperator?: LogicalOperator,
+    ) {
         return this.baseDataService.query<Codegen.GetAssetListQuery, Codegen.GetAssetListQueryVariables>(
             GET_ASSET_LIST,
             {
@@ -353,6 +358,8 @@ export class ProductDataService {
                     sort: {
                         createdAt: SortOrder.DESC,
                     },
+                    filter,
+                    filterOperator,
                 },
             },
         );
@@ -364,12 +371,12 @@ export class ProductDataService {
         });
     }
 
-    createAssets(files: File[]) {
+    createAssets(files: File[], options: Partial<CreateAssetInput> = {}) {
         return this.baseDataService.mutate<
             Codegen.CreateAssetsMutation,
             Codegen.CreateAssetsMutationVariables
         >(CREATE_ASSETS, {
-            input: files.map(file => ({ file })),
+            input: files.map(file => ({ ...options, file })),
         });
     }
 

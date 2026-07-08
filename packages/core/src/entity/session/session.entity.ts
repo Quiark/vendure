@@ -26,6 +26,7 @@ export abstract class Session extends VendureEntity {
 
     @Column() invalidated: boolean;
 
+    @Index('activeOrderId_idx', { unique: false })
     @EntityId({ nullable: true })
     activeOrderId?: ID;
 

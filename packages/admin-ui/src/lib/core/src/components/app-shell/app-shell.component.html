@@ -66,6 +66,12 @@
                 <div class="mx-1">
                     <vdr-alerts></vdr-alerts>
                 </div>
+                <div class="mx-1">
+                    <button type="button" class="btn btn-sm" (click)="switchToEnglish()">
+                        <clr-icon shape="world"></clr-icon>
+                        {{ 'common.language' | translate }}: ENGLISH
+                    </button>
+                </div>
                 <div>
                     <vdr-user-menu
                         [userName]="userName$ | async"

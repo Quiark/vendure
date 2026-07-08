@@ -9,7 +9,7 @@ import {
     Output,
 } from '@angular/core';
 import { unique } from '@vendure/common/lib/unique';
-import { Asset, Permission } from '../../../common/generated-types';
+import { Asset, AssetFilterParameter, CreateAssetInput, Permission } from '../../../common/generated-types';
 import { ModalService } from '../../../providers/modal/modal.service';
 import { AssetPickerDialogComponent } from '../asset-picker-dialog/asset-picker-dialog.component';
 import { AssetPreviewDialogComponent } from '../asset-preview-dialog/asset-preview-dialog.component';
@@ -50,6 +50,12 @@ export class AssetsComponent {
     @Input()
     updatePermissions: string | string[] | Permission | Permission[];
 
+    @Input()
+    assetFilter: AssetFilterParameter = {};
+
+    @Input()
+    createAssetOpts: Partial<CreateAssetInput> = {};
+
     constructor(
         private modalService: ModalService,
         private changeDetector: ChangeDetectorRef,
@@ -59,6 +65,10 @@ export class AssetsComponent {
         this.modalService
             .fromComponent(AssetPickerDialogComponent, {
                 size: 'xl',
+                locals: {
+                    assetFilter: this.assetFilter,
+                    createAssetOpts: this.createAssetOpts,
+                },
             })
             .subscribe(result => {
                 if (result && result.length) {

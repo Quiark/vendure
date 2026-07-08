@@ -13,6 +13,8 @@ import { debounceTime, delay, finalize, map, take as rxjsTake, takeUntil, tap } 
 
 import {
     Asset,
+    AssetFilterParameter,
+    CreateAssetInput,
     CreateAssetsMutation,
     GetAssetListQuery,
     GetAssetListQueryVariables,
@@ -63,6 +65,8 @@ export class AssetPickerDialogComponent implements OnInit, AfterViewInit, OnDest
         itemsPerPage: 25,
         totalItems: 1,
     };
+    assetFilter: AssetFilterParameter = {};
+    createAssetOpts: Partial<CreateAssetInput> = {};
     @ViewChild('assetSearchInputComponent')
     private assetSearchInputComponent: AssetSearchInputComponent;
     @ViewChild('assetGalleryComponent')
@@ -82,7 +86,11 @@ export class AssetPickerDialogComponent implements OnInit, AfterViewInit, OnDest
     constructor(private dataService: DataService, private notificationService: NotificationService) {}
 
     ngOnInit() {
-        this.listQuery = this.dataService.product.getAssetList(this.paginationConfig.itemsPerPage, 0);
+        this.listQuery = this.dataService.product.getAssetList(
+            this.paginationConfig.itemsPerPage,
+            0,
+            this.assetFilter,
+        );
         this.allTags$ = this.dataService.product.getTagList().mapSingle(data => data.tags.items);
         this.assets$ = this.listQuery.stream$.pipe(
             tap(result => (this.paginationConfig.totalItems = result.assets.totalItems)),
@@ -136,7 +144,7 @@ export class AssetPickerDialogComponent implements OnInit, AfterViewInit, OnDest
         if (files.length) {
             this.uploading = true;
             this.dataService.product
-                .createAssets(files)
+                .createAssets(files, this.createAssetOpts)
                 .pipe(finalize(() => (this.uploading = false)))
                 .subscribe(res => {
                     this.fetchPage(this.paginationConfig.currentPage, this.paginationConfig.itemsPerPage);
@@ -162,6 +170,7 @@ export class AssetPickerDialogComponent implements OnInit, AfterViewInit, OnDest
                     name: {
                         contains: searchTerm,
                     },
+                    ...this.assetFilter,
                 },
                 sort: {
                     createdAt: SortOrder.DESC,

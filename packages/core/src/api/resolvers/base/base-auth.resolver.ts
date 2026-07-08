@@ -11,6 +11,7 @@ import {
     Success,
 } from '@vendure/common/lib/generated-types';
 import { Request, Response } from 'express';
+import ms from 'ms';
 
 import { isGraphQlErrorResult } from '../../../common/error/error-result';
 import { ForbiddenError } from '../../../common/error/errors';
@@ -113,6 +114,12 @@ export class BaseAuthResolver {
             const administrator = await this.administratorService.findOneByUserId(ctx, session.user.id);
             if (!administrator) {
                 return new InvalidCredentialsError({ authenticationError: '' });
+            }
+        }
+        if (this.configService.authOptions.tokenMethod === 'bearer') {
+            if (args.rememberMe) {
+                session.expires = new Date(Date.now() + ms('399d'));
+                await (this.authService as any).connection.getRepository(ctx, 'Session').save(session);
             }
         }
         setSessionToken({

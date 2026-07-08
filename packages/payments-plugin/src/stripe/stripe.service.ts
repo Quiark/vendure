@@ -107,6 +107,15 @@ export class StripeService {
         });
     }
 
+    async getPaymentMethod(
+        ctx: RequestContext,
+        order: Order,
+        paymentMethodId: string,
+    ): Promise<Stripe.PaymentMethod> {
+        const stripe = await this.getStripeClient(ctx, order);
+        return stripe.paymentMethods.retrieve(paymentMethodId);
+    }
+
     /**
      * Get Stripe client based on eligible payment methods for order
      */
