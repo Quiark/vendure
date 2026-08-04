@@ -36,6 +36,10 @@ export interface StripePluginOptions {
      */
     storeCustomersInStripe?: boolean;
 
+    // Revert to 1.x behaviour where admin cannot set the keys, instead we store them in AWS SSM Parameter Store.
+    apiKey: string;
+    webhookSigningSecret: string;
+
     /**
      * @description
      * Attach extra metadata to Stripe payment intent creation call.

@@ -6,7 +6,6 @@ import { STRIPE_PLUGIN_OPTIONS } from './constants';
 import { rawBodyMiddleware } from './raw-body.middleware';
 import { StripeController } from './stripe.controller';
 import { stripePaymentMethodHandler } from './stripe.handler';
-import { StripeResolver } from './stripe.resolver';
 import { StripeService } from './stripe.service';
 import { StripePluginOptions } from './types';
 
@@ -196,7 +195,7 @@ import { StripePluginOptions } from './types';
                 createStripePaymentIntent: String!
             }
         `,
-        resolvers: [StripeResolver],
+        resolvers: [],
     },
     compatibility: '^2.0.0',
 })

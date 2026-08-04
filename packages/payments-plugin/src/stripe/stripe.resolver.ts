@@ -11,6 +11,7 @@ import {
 
 import { StripeService } from './stripe.service';
 
+/* we are overriding this and it conflicts so bye
 @Resolver()
 export class StripeResolver {
     constructor(private stripeService: StripeService, private activeOrderService: ActiveOrderService) {}
@@ -28,3 +29,4 @@ export class StripeResolver {
         return this.stripeService.createPaymentIntent(ctx, sessionOrder);
     }
 }
+*/

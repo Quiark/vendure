@@ -138,9 +138,9 @@ export class StripeService {
         if (!isEligible) {
             throw new UserInputError(`Stripe payment method is not eligible for order ${order.code}`);
         }
-        const apiKey = this.findOrThrowArgValue(stripePaymentMethod.handler.args, 'apiKey');
-        const webhookSecret = this.findOrThrowArgValue(stripePaymentMethod.handler.args, 'webhookSecret');
-        return new VendureStripeClient(apiKey, webhookSecret);
+        // const apiKey = this.findOrThrowArgValue(stripePaymentMethod.handler.args, 'apiKey');
+        // const webhookSecret = this.findOrThrowArgValue(stripePaymentMethod.handler.args, 'webhookSecret');
+        return new VendureStripeClient(this.options.apiKey, this.options.webhookSigningSecret);
     }
 
     private findOrThrowArgValue(args: ConfigArg[], name: string): string {
